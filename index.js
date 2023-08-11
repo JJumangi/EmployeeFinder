@@ -1,5 +1,19 @@
 const inquirer = require("inquirer");
-const connection = require("./config/connection");
+const fs = require('fs');
+const mysql = require("mysql2");
+const express = require('express');
+
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "Jon1234",
+  database: "employees_db"
+},
+console.log('database: employee_db, connected'));
+
+connection.connect(function (err) {
+  if (err) throw err;
+});
 
 /*
   There are a lot of menu items presented to users in this app. The only real way you cam manage them 
@@ -9,7 +23,7 @@ const connection = require("./config/connection");
 */ 
 
 
-function start(){
+function start(connection){
   inquirer
     .prompt([
     {   
@@ -54,51 +68,113 @@ function start(){
   ]).then( response => {
     switch(response.option){
       case "view_departments":
-        viewDepartments();
+        viewDepartments(connection);
         break;
       case "view_roles":
-       viewRoles();
+       viewRoles(connection);
         break;
       case "view_employees":
-       viewEmployees();
+       viewEmployees(connection);
         break;
       case "add_department":
-       addDepartment();
+       addDepartment(connection);
         break;
       case "add_role":
-       addRole();
+       addRole(connection);
         break;
       case "add_employee":
-        addEmployee();
+        addEmployee(connection);
         break;
       case "update_employee":
-        updateEmployeeManager();
+        updateEmployeeManager(connection);
       default:
         exit();
     }
   })
+};
+
+//VIEW SECTION
+//all departments
+async function viewDepartments(connection) {
+  try {
+    const [rows] = await connection.query('SELECT * FROM departments');
+    console.log('Departments:');
+    console.table(rows);
+    start(connection);
+  } catch (error) {
+    console.error('Error', error);
+    start(connection);
+  }
+};
+
+//all roles
+async function viewRoles(connection) {
+  try {
+    const [rows] = await connection.query('SELECT * FROM roles');
+    console.log('Roles:');
+    console.table(rows);
+    start(connection);
+  } catch (error) {
+    console.error('Error', error);
+    start(connection);
+  }
+};
+
+//all employees
+async function viewEmployees(connection) {
+  try {
+    const [rows] = await connection.query('SELECT * FROM roles');
+    console.log('Employyes:');
+    console.table(rows);
+    start(connection);
+  }catch (error) {
+    console.error('Error', error);
+    start(connection);
+  }
+};
+
+//ADD SECTION
+
+//add department
+async function addDepartment(connection) {
+  try {
+    const input = await inquirer.prompt([
+      {
+        name: 'name',
+        type: 'input',
+        message: 'Enter the name of department you want to add:',
+        validate: (value) => {
+          if (value.trim()) {
+            return true;
+          }
+          return 'Enter department name.';
+        },
+      },
+    ]);
+
+    //add new department to db
+    await connection.query('INSERT INTO departments SET ?', { name: answer.name });
+    console.log('Department added successfully!');
+    start(connection);
+  } catch (error) {
+    console.error('Error adding department:', error);
+    start(connection);
+  }
 }
 
-function viewDepartments() {
-  var query = connection.query(
-      "SELECT name as 'Department Name', deptId as 'Department ID' from department ORDER BY name",
-      function (err, data) {
-          if (err) throw err;
-          console.table(data);
-          continuePrompt();
+//add role
+async function addRole(connection) {
+  try {
+    const input = await inquirer.prompt([
+      {
+        name: 'name',
+        type: 'input',
+        message: 'Enter role name',
+        validate: (value) => {
+
+        }
       }
-  )
+    ])
+  }
 }
-
-function viewRoles () {
-  var query = connection.query(
-    "SELECT roleId as 'Role ID', title as 'Role', salary as 'Salary', department_id as 'Department ID' from role",
-    function (err, data) {
-        if (err) throw err;
-        console.table(data);
-        continuePrompt();
-    })
-}
-
-
-// start();
+start()
