@@ -23,7 +23,7 @@ connection.connect(function (err) {
 */ 
 
 
-function start(connection){
+function start(){
   inquirer
     .prompt([
     {   
@@ -86,7 +86,7 @@ function start(connection){
         addEmployee(connection);
         break;
       case "update_employee":
-        updateEmployeeManager(connection);
+        updateEmployee(connection);
       default:
         exit();
     }
@@ -138,7 +138,8 @@ async function viewEmployees(connection) {
 //add department
 async function addDepartment(connection) {
   try {
-    const input = await inquirer.prompt([
+    //get department info
+    const answer = await inquirer.prompt([
       {
         name: 'name',
         type: 'input',
@@ -165,16 +166,136 @@ async function addDepartment(connection) {
 //add role
 async function addRole(connection) {
   try {
-    const input = await inquirer.prompt([
+    //get role info
+    const answer = await inquirer.prompt([
       {
-        name: 'name',
+        name: 'title',
         type: 'input',
-        message: 'Enter role name',
+        message: 'Enter title for new role',
         validate: (value) => {
+          if (value.trim()) {
+            return true;
+          }
+          return 'Must enter a role tile.';
+        },
+      },
+      {
+        name: 'salary',
+        type: 'input',
+        message: 'Enter a salary for this role',
+        validate: (value) => {
+          const valid = !isNan(parseFloat(value));
+          return valid || 'enter a salary for this role.'
+        },
+      },
+      {
+        name: 'department',
+        type: 'list',
+        message: 'which department will this role fall under?',
+        choices: departments.map((department) => ({
+          name: department.name,
+          value: department.id,
+        })),
+      },
+    ]);
 
-        }
-      }
-    ])
+    //add new role to db
+    await connection.query('INSERT INTO roles SET ?', {
+      title: answer.title,
+      salary: answer.salary,
+      department_id: answer.departmentId,
+    });
+    console.log('Role added successfully!');
+    start(connection);
+  } catch (error) {
+    console.error('Error adding role:', error);
+    start(connection);
   }
 }
-start()
+
+//add an employee
+async function addEmployee(connection) {
+  try {
+    const [roles] = await connection.query('SELECT * FROM roles');
+    const [employees] = await connection.query('SELECT * FROM employees');
+    //get employee info
+    const answer = await inquirer.prompt([
+      {
+        name: 'firstName',
+        type: 'input',
+        message: 'Enter first name:',
+        validate: (value) => {
+          if (value.trim()) {
+            return true;
+          }
+          return 'Enter first name.';
+        },
+      },
+      {
+        name: 'lastName',
+        type: 'input',
+        message: 'Enter last name:',
+        validate: (value) => {
+          if (value.trim()) {
+            return true;
+          }
+          return 'Enter last name.';
+        },
+      },
+      {
+        name: 'roleId',
+        type: 'list',
+        messaging: 'Which role does this employee have?',
+        choices: roles.map((role) => ({
+          name: role.title,
+          value: role.id,
+      })),
+      },
+    //add new employee to db
+      await connection.query('INSERT INTO employees SET?'), {
+        first_name: answer.firstName,
+        last_name: answer.lastName,
+        role_id: answer.role_id,
+      }]);
+      console.log('This employee has been added to the system.');
+      start(connection);
+  } catch (error) {
+    console.error('Error, cannot add employee.', error);
+    start(connection);
+  }
+}
+//update employee
+async function updateEmployee(connection) {
+  try {
+    const [employees] = await connection.query('SELECT * FROM employees');
+    const [roles] = await connection.query('SELECT * FROM roles');
+    const answer = await inquirer.prompt([
+      {
+        name: 'employee_id',
+        type: 'list',
+        message: 'Which employee do you want to update?',
+        choices: employees.map((employee) => ({
+          name: `${employee.first_name} ${employee.last_name}`,
+          value: employee.id,
+        })),
+      },
+      {
+        name: 'role_id',
+        type: 'list',
+        message: 'What is this employees new role?',
+        choices: role.map((role) => ({
+          name: role.title,
+          value: role.id,
+        })),
+      },
+    ]);
+    //update employees new role
+    await connection.query('UPDATE employees SET role_id = ? WHERE id = ?', [answer.role_id, answer.employee_id]);
+    console.log('Employees role has been updated.');
+    start(connection);
+  } catch (error) {
+    console.error('Error, try again', error);
+    start(connection);
+  }
+};    
+      start();
