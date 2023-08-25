@@ -4,11 +4,20 @@
 
 For this assignment:
 
-- I was attempting to create a note-taking application using express.
-- This application utlizes the inquirer package and has utilized Jest for unit testing.
-- The app generates a logo using 3 selected characters, a shape and two colors (one for text, one for shape) to create the logo.
+- I was attempting to create an employee managment system.
+- This applications allows users to view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role.
+- This application utlizes the inquirer package inlcuding MySQL and Node.js.
 
-## **Link to Working Application**
+## **Link to Application Walk-Through**
+
+## **Instructions for running program from command line**
+
+- mysql -u root -p
+- enter MySQL PW
+- source db/schema.sql
+- exit
+- npm run seed
+- npm start
 
 Thank you for looking at my project!
 -Jon

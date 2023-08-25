@@ -7,9 +7,9 @@ const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "Jon1234",
-  database: "employees_db"
+  database: "employees"
 },
-console.log('database: employee_db, connected'));
+console.log('database: employee, connected'));
 
 connection.connect(function (err) {
   if (err) throw err;
@@ -23,7 +23,7 @@ connection.connect(function (err) {
 */ 
 
 
-function start(){
+function start(connection){
   inquirer
     .prompt([
     {   
