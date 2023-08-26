@@ -87,8 +87,8 @@ function start(){
         break;
       case "update_employee":
         updateEmployee();
-      default:
-        exit();
+      // default:
+      //   exit();
     }
   })
 };
@@ -124,7 +124,7 @@ async function viewRoles() {
 async function viewEmployees() {
   try {
     const [rows] = await connection.promise().query('SELECT * FROM role');
-    console.log('Employees:');
+    console.log('Employee:');
     console.table(rows);
     start();
   }catch (error) {
@@ -268,7 +268,7 @@ async function addEmployee() {
 async function updateEmployee() {
   try {
     const [employees] = await connection.promise().query('SELECT * FROM employee');
-    const [roles] = await connection.promise().query('SELECT * FROM role');
+    const [role] = await connection.promise().query('SELECT * FROM role');
     const answer = await inquirer.prompt([
       {
         name: 'employee_id',
