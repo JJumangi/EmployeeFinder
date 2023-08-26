@@ -23,7 +23,7 @@ connection.connect(function (err) {
 */ 
 
 
-function start(connection){
+function start(){
   inquirer
     .prompt([
     {   
@@ -68,25 +68,25 @@ function start(connection){
   ]).then( response => {
     switch(response.option){
       case "view_departments":
-        viewDepartments(connection);
+        viewDepartments();
         break;
       case "view_roles":
-       viewRoles(connection);
+       viewRoles();
         break;
       case "view_employees":
-       viewEmployees(connection);
+       viewEmployees();
         break;
       case "add_department":
-       addDepartment(connection);
+       addDepartment();
         break;
       case "add_role":
-       addRole(connection);
+       addRole();
         break;
       case "add_employee":
-        addEmployee(connection);
+        addEmployee();
         break;
       case "update_employee":
-        updateEmployee(connection);
+        updateEmployee();
       default:
         exit();
     }
@@ -95,48 +95,48 @@ function start(connection){
 
 //VIEW SECTION
 //all departments
-async function viewDepartments(connection) {
+async function viewDepartments() {
   try {
-    const [rows] = await connection.query('SELECT * FROM departments');
+    const [rows] = await connection.promise().query('SELECT * FROM department');
     console.log('Departments:');
     console.table(rows);
-    start(connection);
+    start();
   } catch (error) {
     console.error('Error', error);
-    start(connection);
+    start();
   }
 };
 
 //all roles
-async function viewRoles(connection) {
+async function viewRoles() {
   try {
-    const [rows] = await connection.query('SELECT * FROM roles');
+    const [rows] = await connection.promise().query('SELECT * FROM role');
     console.log('Roles:');
     console.table(rows);
-    start(connection);
+    start();
   } catch (error) {
     console.error('Error', error);
-    start(connection);
+    start();
   }
 };
 
 //all employees
-async function viewEmployees(connection) {
+async function viewEmployees() {
   try {
-    const [rows] = await connection.query('SELECT * FROM roles');
-    console.log('Employyes:');
+    const [rows] = await connection.promise().query('SELECT * FROM role');
+    console.log('Employees:');
     console.table(rows);
-    start(connection);
+    start();
   }catch (error) {
     console.error('Error', error);
-    start(connection);
+    start();
   }
 };
 
 //ADD SECTION
 
 //add department
-async function addDepartment(connection) {
+async function addDepartment() {
   try {
     //get department info
     const answer = await inquirer.prompt([
@@ -154,17 +154,17 @@ async function addDepartment(connection) {
     ]);
 
     //add new department to db
-    await connection.query('INSERT INTO departments SET ?', { name: answer.name });
+    await connection.promise().query('INSERT INTO department SET ?', { name: answer.name });
     console.log('Department added successfully!');
-    start(connection);
+    start();
   } catch (error) {
     console.error('Error adding department:', error);
-    start(connection);
+    start();
   }
 }
 
 //add role
-async function addRole(connection) {
+async function addRole() {
   try {
     //get role info
     const answer = await inquirer.prompt([
@@ -200,24 +200,24 @@ async function addRole(connection) {
     ]);
 
     //add new role to db
-    await connection.query('INSERT INTO roles SET ?', {
+    await connection.promise().query('INSERT INTO role SET ?', {
       title: answer.title,
       salary: answer.salary,
       department_id: answer.departmentId,
     });
     console.log('Role added successfully!');
-    start(connection);
+    start();
   } catch (error) {
     console.error('Error adding role:', error);
-    start(connection);
+    start();
   }
 }
 
 //add an employee
-async function addEmployee(connection) {
+async function addEmployee() {
   try {
-    const [roles] = await connection.query('SELECT * FROM roles');
-    const [employees] = await connection.query('SELECT * FROM employees');
+    const [roles] = await connection.promise().query('SELECT * FROM role');
+    const [employees] = await connection.promise().query('SELECT * FROM employee');
     //get employee info
     const answer = await inquirer.prompt([
       {
@@ -252,23 +252,23 @@ async function addEmployee(connection) {
       })),
       },
     //add new employee to db
-      await connection.query('INSERT INTO employees SET?'), {
+      await connection.promise().query('INSERT INTO employee SET?'), {
         first_name: answer.firstName,
         last_name: answer.lastName,
         role_id: answer.role_id,
       }]);
       console.log('This employee has been added to the system.');
-      start(connection);
+      start();
   } catch (error) {
     console.error('Error, cannot add employee.', error);
-    start(connection);
+    start();
   }
 }
 //update employee
-async function updateEmployee(connection) {
+async function updateEmployee() {
   try {
-    const [employees] = await connection.query('SELECT * FROM employees');
-    const [roles] = await connection.query('SELECT * FROM roles');
+    const [employees] = await connection.promise().query('SELECT * FROM employee');
+    const [roles] = await connection.promise().query('SELECT * FROM role');
     const answer = await inquirer.prompt([
       {
         name: 'employee_id',
@@ -290,12 +290,12 @@ async function updateEmployee(connection) {
       },
     ]);
     //update employees new role
-    await connection.query('UPDATE employees SET role_id = ? WHERE id = ?', [answer.role_id, answer.employee_id]);
+    await connection.promise().query('UPDATE employee SET role_id = ? WHERE id = ?', [answer.role_id, answer.employee_id]);
     console.log('Employees role has been updated.');
-    start(connection);
+    start();
   } catch (error) {
     console.error('Error, try again', error);
-    start(connection);
+    start();
   }
 };    
       start();
