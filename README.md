@@ -12,9 +12,9 @@ For this assignment:
 
 https://drive.google.com/file/d/16f7jfLKBY0DDVbXuQiWXFk5LCd_lnB1g/view
 
-## **Link to Deployed Application**
+## **Link to Application's Repo**
 
-https://armaj-employee-manager-0191272b4fc1.herokuapp.com/
+https://github.com/JJumangi/EmployeeFinder
 
 ## **Instructions for running program from command line**
 
