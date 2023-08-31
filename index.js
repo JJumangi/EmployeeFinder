@@ -87,8 +87,8 @@ function start(){
         break;
       case "update_employee":
         updateEmployee();
-      // default:
-      //   exit();
+      default:
+        exit();
     }
   })
 };
